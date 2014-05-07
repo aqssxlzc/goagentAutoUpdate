@@ -64,11 +64,15 @@ urllib.urlretrieve ('https://goagent.googlecode.com/archive/3.0.zip',filename)
 #print link.read()
 #3.2 get local goagent version
 def getLocalGAEVersion(path):
-	
+	return
 	
 #3.3 get remote goagent version
+def getRemoteGAEVersion():
+    return ""
 #3.4 if new version released goto update
 #4. do update
+def updateGAE():
+    return
 #4.1 download goagent package via proxy
 #4.2 extract downloaded package
 #4.3 get local goagent config info
