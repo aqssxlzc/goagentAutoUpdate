@@ -54,9 +54,18 @@ proxy = urllib2.ProxyHandler({'http': '127.0.0.1:8087'})
 opener = urllib2.build_opener(proxy)
 urllib2.install_opener(opener)
 link= urllib2.urlopen('https://goagent.googlecode.com/archive/3.0.zip')
-print link.geturl()
+#link= urllib2.urlopen('https://baidu.com')
+import cgi
+_, params = cgi.parse_header(link.headers.get('Content-Disposition', ''))
+ 
+filename = params['filename']
+import urllib
+urllib.urlretrieve ('https://goagent.googlecode.com/archive/3.0.zip',filename)
 #print link.read()
 #3.2 get local goagent version
+def getLocalGAEVersion(path):
+	
+	
 #3.3 get remote goagent version
 #3.4 if new version released goto update
 #4. do update
