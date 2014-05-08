@@ -1,8 +1,3 @@
-import urllib2
-import psutil
-import logging
-import os
-import re
 #1.get local goagent path
 #2.check if goagent runing
 #2.1 if not running then start local goagent 
@@ -20,6 +15,11 @@ import re
 #4.6 start new goagent
 #4.7 delete old goagent
 
+import urllib2
+import psutil
+import logging
+import os
+import re
 
 #1.get local goagent path
 localpath="C:\\Users\\Administrator"
@@ -64,6 +64,13 @@ urllib.urlretrieve ('https://goagent.googlecode.com/archive/3.0.zip',filename)
 #print link.read()
 #3.2 get local goagent version
 def getLocalGAEVersion(path):
+    filepath = path+"\\local\\proxy.py"
+    f=open(filename,'r')
+    filecontent = f.readlines()
+    versionlinePattern =re.complie("__version__ = '.'")
+    for line in f.readlines():
+        if versionlinePattern.match(line)!=None:
+            return line
 	return
 	
 #3.3 get remote goagent version
