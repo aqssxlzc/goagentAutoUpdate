@@ -57,7 +57,6 @@ link= urllib2.urlopen('https://goagent.googlecode.com/archive/3.0.zip')
 #link= urllib2.urlopen('https://baidu.com')
 import cgi
 _, params = cgi.parse_header(link.headers.get('Content-Disposition', ''))
- 
 filename = params['filename']
 import urllib
 urllib.urlretrieve ('https://goagent.googlecode.com/archive/3.0.zip',filename)
@@ -78,8 +77,21 @@ def getRemoteGAEVersion():
     return ""
 #3.4 if new version released goto update
 #4. do update
-def updateGAE():
+def updateGAE(oldpath,newpath):
+    if checkGAERunning()!=False:
+        info = checkGAERunning()
+        info.kill()
     return
+def checkGAERunning():
+    for pid in psutil.pids():
+	try:
+		info = psutil.Process(pid)
+		if info.name()=='goagent.exe':
+			return info
+			break
+	except:
+		pass
+    return False
 #4.1 download goagent package via proxy
 #4.2 extract downloaded package
 #4.3 get local goagent config info
