@@ -50,27 +50,26 @@ if hasGoagentRunning==False and goagentPath!="":
 	subprocess.Popen(goagentPath+"\\local\\goagent.exe")
 #3.check goagent update using proxy
 #3.1 visit goagent site via proxy
-proxy = urllib2.ProxyHandler({'http': '127.0.0.1:8087'})
-opener = urllib2.build_opener(proxy)
-urllib2.install_opener(opener)
-link= urllib2.urlopen('https://goagent.googlecode.com/archive/3.0.zip')
-#link= urllib2.urlopen('https://baidu.com')
-import cgi
-_, params = cgi.parse_header(link.headers.get('Content-Disposition', ''))
-filename = params['filename']
-import urllib
-urllib.urlretrieve ('https://goagent.googlecode.com/archive/3.0.zip',filename)
+def getGAE():
+    proxy = urllib2.ProxyHandler({'http': '127.0.0.1:8087'})
+    opener = urllib2.build_opener(proxy)
+    urllib2.install_opener(opener)
+    link= urllib2.urlopen('https://goagent.googlecode.com/archive/3.0.zip')
+    import cgi
+    _, params = cgi.parse_header(link.headers.get('Content-Disposition', ''))
+    filename = params['filename']
+    import urllib
+    urllib.urlretrieve ('https://goagent.googlecode.com/archive/3.0.zip',filename)
 #print link.read()
 #3.2 get local goagent version
 def getLocalGAEVersion(path):
     filepath = path+"\\local\\proxy.py"
-    f=open(filename,'r')
-    filecontent = f.readlines()
-    versionlinePattern =re.complie("__version__ = '.'")
-    for line in f.readlines():
-        if versionlinePattern.match(line)!=None:
-            return line
-	return
+    versionlinePattern =re.compile("__version__ = \'.+\'")
+    with open(filepath) as file:
+        for line in file:
+            if versionlinePattern.match(line)!=None:
+                return line
+
 	
 #3.3 get remote goagent version
 def getRemoteGAEVersion():
@@ -81,6 +80,12 @@ def updateGAE(oldpath,newpath):
     if checkGAERunning()!=False:
         info = checkGAERunning()
         info.kill()
+
+    return
+
+def getGAEconf(path):
+    file=open(path+"//local//proxy.ini")
+
     return
 def checkGAERunning():
     for pid in psutil.pids():
