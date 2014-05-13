@@ -80,20 +80,20 @@ def checkGAERunning():
             pass
     return False
 
+def findgaepath(path):
+    goagentFolderPattern = "goagent-"
+    pattern = re.compile(goagentFolderPattern)
+    for filename in os.listdir(path):
+        if pattern.match(filename) is not None:
+            return  localpath + "\\" + filename
 
 #1.get local goagent path
 localpath = "C:\\Users\\Administrator"
 logging.warning('goagent path is ' + localpath)
-goagentPath = ""
-goagentFolderPattern = "goagent"
-pattern = re.compile(goagentFolderPattern)
-for filename in os.listdir(localpath):
-    if pattern.match(filename) is not None:
-        goagentPath = localpath + "\\" + filename
-        print  goagentPath
+goagentPath = findgaepath(localpath)
+
 
 #2.check if goagent runing
-hasGoagentRunning = checkGAERunning()
 
 #2.1 if not running then start local goagent
 if checkGAERunning() is False and goagentPath != "":
