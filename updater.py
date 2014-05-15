@@ -47,12 +47,21 @@ def getLocalGAEVersion(path):
     with open(filepath) as file:
         for line in file:
             if versionlinePattern.match(line) is not None:
-                return line
+                return line.replace('__version__ = \'','').replace('\'','')
 
+def getremoteversion():
+    goagenturl="https://code.google.com/p/goagent/"
+    proxy = urllib2.ProxyHandler({'http': '127.0.0.1:8087'})
+    opener = urllib2.build_opener(proxy)
+    urllib2.install_opener(opener)
+    link = urllib2.urlopen(goagenturl)
+    html= link.read()
+    pattern = re.compile('goagent \d+.\d+.\d+')
+    resultstr= pattern.search(html).group()
+    if resultstr is not None:
+        return resultstr.replace('goagent','').lstrip()
 
 #3.3 get remote goagent version
-def getRemoteGAEVersion():
-    return ""
 
 
 #3.4 if new version released goto update
@@ -68,6 +77,10 @@ def getGAEconf(path):
     file = open(path + "//local//proxy.ini")
     return
 
+def versioncmp(version1, version2):
+    def normalize(v):
+        return [int(x) for x in re.sub(r'(\.0+)*$','', v).split(".")]
+    return cmp(normalize(version1), normalize(version2))
 
 def checkGAERunning():
     for pid in psutil.pids():
@@ -91,9 +104,19 @@ def findgaepath(path):
 localpath = "C:\\Users\\Administrator"
 logging.warning('goagent path is ' + localpath)
 goagentPath = findgaepath(localpath)
+if goagentPath is not None:
+    print "Find Goagent in path "+goagentPath
 
+localversion = getLocalGAEVersion(goagentPath)
+print "Local Version is "+localversion
 
+remoteversion = getremoteversion()
+print "Remote Version is "+remoteversion
 #2.check if goagent runing
+if versioncmp(localversion,remoteversion):
+    print "New version detected"
+else:
+    print "exit"
 
 #2.1 if not running then start local goagent
 if checkGAERunning() is False and goagentPath != "":
