@@ -20,10 +20,9 @@ import psutil
 import logging
 import os
 import re
-
+import subprocess
 
 def startgae():
-    import subprocess
     subprocess.Popen(goagentPath + "\\local\\goagent.exe")
 #3.check goagent update using proxy
 #3.1 visit goagent site via proxy
@@ -36,7 +35,8 @@ def getGAE():
     _, params = cgi.parse_header(link.headers.get('Content-Disposition', ''))
     filename = params['filename']
     import urllib
-    urllib.urlretrieve('https://goagent.googlecode.com/archive/3.0.zip', filename)
+    urllib.urlretrieve('https://goagent.googlecode.com/archive/3.0.zip', localpath+filename)
+    return filename
 
 
 #print link.read()
@@ -98,10 +98,10 @@ def findgaepath(path):
     pattern = re.compile(goagentFolderPattern)
     for filename in os.listdir(path):
         if pattern.match(filename) is not None:
-            return  localpath + "\\" + filename
+            return  localpath + filename
 
 #1.get local goagent path
-localpath = "C:\\Users\\Administrator"
+localpath = "C:\\Users\\Administrator\\"
 logging.warning('goagent path is ' + localpath)
 goagentPath = findgaepath(localpath)
 if goagentPath is not None:
@@ -113,8 +113,19 @@ print "Local Version is "+localversion
 remoteversion = getremoteversion()
 print "Remote Version is "+remoteversion
 #2.check if goagent runing
+
+retry=0
 if versioncmp(localversion,remoteversion):
     print "New version detected"
+    while retry <10:
+        retry+=1
+        try:
+           newgaefile=getGAE()
+           break
+        except:
+            print "Download error, retry "+str(retry)+" times."
+            continue
+    subprocess.call("7za e "+newgaefile)
 else:
     print "exit"
 
