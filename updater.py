@@ -27,16 +27,17 @@ def startgae():
 #3.check goagent update using proxy
 #3.1 visit goagent site via proxy
 def getGAE():
-    proxy = urllib2.ProxyHandler({'http': '127.0.0.1:8087'})
-    opener = urllib2.build_opener(proxy)
-    urllib2.install_opener(opener)
+    #proxy = urllib2.ProxyHandler({'http': '127.0.0.1:8087'})
+    #opener = urllib2.build_opener(proxy)
+    #urllib2.install_opener(opener)
     link = urllib2.urlopen('https://goagent.googlecode.com/archive/3.0.zip')
     import cgi
     _, params = cgi.parse_header(link.headers.get('Content-Disposition', ''))
     filename = params['filename']
     import urllib
+    print "Save goagent pack in "+localpath+filename
     urllib.urlretrieve('https://goagent.googlecode.com/archive/3.0.zip', localpath+filename)
-    return filename
+    return localpath+filename
 
 
 #print link.read()
@@ -74,8 +75,13 @@ def updateGAE(oldpath, newpath):
 
 
 def getGAEconf(path):
-    file = open(path + "//local//proxy.ini")
-    return
+    file = open(path + "//local//proxy.ini",'r')
+    for line in file:
+        match = re.compile("appid =.+").match(line)
+        if match:
+            return match.group().replace("appid =","")
+
+
 
 def versioncmp(version1, version2):
     def normalize(v):
@@ -94,11 +100,20 @@ def checkGAERunning():
     return False
 
 def findgaepath(path):
-    goagentFolderPattern = "goagent-"
+    goagentFolderPattern = "goagent-[^zip]+"
     pattern = re.compile(goagentFolderPattern)
     for filename in os.listdir(path):
         if pattern.match(filename) is not None:
-            return  localpath + filename
+            if '.' not in filename:
+                return  localpath + filename
+
+def appid2conf(ids,path):
+    with open(path+"\\local\\proxy.ini","r+") as file:
+        content = file.read()
+        content= content.replace("appid = goagent","appid ="+ids)
+        print content
+        file.seek(0)
+        file.write(content)
 
 #1.get local goagent path
 localpath = "C:\\Users\\Administrator\\"
@@ -125,9 +140,16 @@ if versioncmp(localversion,remoteversion):
         except:
             print "Download error, retry "+str(retry)+" times."
             continue
-    subprocess.call("7za e "+newgaefile)
+    subprocess.call("7za x "+newgaefile+" -o"+localpath)
 else:
     print "exit"
+    exit()
+
+newversionpath = localpath+newgaefile.split(".")[0].split("\\")[-1]
+
+appids = getGAEconf(localversion)
+print "local appids is "+appids
+appid2conf(appids,newversionpath)
 
 #2.1 if not running then start local goagent
 if checkGAERunning() is False and goagentPath != "":
