@@ -21,6 +21,7 @@ import logging
 import os
 import re
 import subprocess
+import ConfigParser
 
 def startgae():
     subprocess.Popen(goagentPath + "\\local\\goagent.exe")
@@ -115,8 +116,16 @@ def appid2conf(ids,path):
         file.seek(0)
         file.write(content)
 
+def initConfig(gaepath):
+    config = ConfigParser.RawConfigParser()
+    config.add_section('BaseSetting')
+    config.set('BaseSetting', 'gaepath', gaepath)
+    with open(os.path.expanduser("~")+'//gae.cfg', 'wb') as configfile:
+        config.write(configfile)
+
+
 #1.get local goagent path
-localpath = "C:\\Users\\Administrator\\"
+localpath = os.path.expanduser("~")
 logging.warning('goagent path is ' + localpath)
 goagentPath = findgaepath(localpath)
 if goagentPath is not None:
