@@ -108,6 +108,16 @@ def findgaepath(path):
             if '.' not in filename:
                 return  localpath + filename
 
+def findAllgae(path):
+    gaepath=[]
+    goagentFolderPattern = "goagent-[^zip]+"
+    pattern = re.compile(goagentFolderPattern)
+    for filename in os.listdir(path):
+        if pattern.match(filename) is not None:
+            if '.' not in filename:
+                gaepath.append(localpath + filename)
+    return  gaepath
+
 def appid2conf(ids,path):
     with open(path+"\\local\\proxy.ini","r+") as file:
         content = file.read()
@@ -130,6 +140,10 @@ logging.warning('goagent path is ' + localpath)
 goagentPath = findgaepath(localpath)
 if goagentPath is not None:
     print "Find Goagent in path "+goagentPath
+
+gaepaths = findAllgae(os.path.expanduser("~"))
+for path in gaepaths:
+    print "Find Goagent in " +path
 
 localversion = getLocalGAEVersion(goagentPath)
 print "Local Version is "+localversion
