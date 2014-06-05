@@ -106,7 +106,7 @@ def findgaepath(path):
     for filename in os.listdir(path):
         if pattern.match(filename) is not None:
             if '.' not in filename:
-                return  localpath + filename
+                return  localpath +"\\"+ filename
 
 def findAllgae(path):
     gaepath=[]
@@ -115,7 +115,7 @@ def findAllgae(path):
     for filename in os.listdir(path):
         if pattern.match(filename) is not None:
             if '.' not in filename:
-                gaepath.append(localpath + filename)
+                gaepath.append(localpath +"\\"+ filename)
     return  gaepath
 
 def appid2conf(ids,path):
